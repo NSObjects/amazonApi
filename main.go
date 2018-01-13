@@ -1,7 +1,6 @@
 package main
 
 import (
-	"echo/middleware"
 	"net/http"
 
 	"fmt"
@@ -13,6 +12,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func main() {
