@@ -436,7 +436,7 @@ func init() {
 		fmt.Println(err)
 	}
 	time.Local = local
-	err = orm.RegisterDataBase("default", "mysql", "root:123456@tcp(127.0.0.1:3306)/amazon?parseTime=true&loc=Asia%2FShanghai", 30, 30)
+	err = orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/amazon?parseTime=true&loc=Asia%2FShanghai", 30, 30)
 	if err != nil {
 		fmt.Println(err)
 	}
