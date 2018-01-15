@@ -9,6 +9,8 @@ import (
 	_ "amazonApi/models"
 	"strconv"
 
+	"amazonApi/models"
+
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -59,15 +61,31 @@ func main() {
 			page -= 1
 		}
 
+		name := c.QueryParam("name")
 		var maps []orm.Params
-		_, err = o.Raw("select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,count(*) "+
-			"from user,product "+
-			"where user.id = product.user_id "+
-			"Group by user.id "+
-			"order by count(*) "+
-			"Desc limit ? offset ?", size, page*size).Values(&maps)
-		if err != nil {
-			return c.String(http.StatusBadRequest, err.Error())
+		if name == "" {
+
+			_, err = o.Raw("select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,count(*) "+
+				"from user,product "+
+				"where user.id = product.user_id "+
+				"Group by user.id "+
+				"order by count(*) "+
+				"Desc limit ? offset ?", size, page*size).Values(&maps)
+			if err != nil {
+				return c.String(http.StatusBadRequest, err.Error())
+			}
+		} else {
+
+			v := "select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,count(*) " +
+				"from user,product where user.id = product.user_id and user.name like"
+			v += " '%"
+			v += fmt.Sprintf("%s", name)
+			v += "%' Group by user.id order by count(*) Desc "
+			v += fmt.Sprintf("limit %d offset %d", size, page*size)
+			_, err = o.Raw(v).Values(&maps)
+			if err != nil {
+				return c.String(http.StatusBadRequest, err.Error())
+			}
 		}
 
 		for _, v := range maps {
@@ -87,12 +105,20 @@ func main() {
 			userJson.Datas = append(userJson.Datas, data)
 		}
 
-		_, err = o.Raw("select count(*) from user").Values(&maps)
+		if name == "" {
+			_, err = o.Raw("select count(*) from user").Values(&maps)
+		} else {
+			v := "select count(*) from user where user.name like"
+			v += " '%"
+			v += fmt.Sprintf("%s", name)
+			v += "%'"
+			_, err = o.Raw(v).Values(&maps)
+		}
 
 		if err != nil {
 			return c.String(http.StatusBadRequest, err.Error())
 		}
-		//fmt.Println(maps)
+
 		if len(maps) > 0 {
 			if s, ok := maps[0]["count(*)"].(string); ok {
 				count, err := strconv.Atoi(s)
@@ -182,6 +208,7 @@ func main() {
 			Id              string `json:"id"`
 			Name            string `json:"name"`
 			ReviewUserCount string `json:"review_user_count"`
+			CategoryLink    string `json:"category_link"`
 		}
 		var category = struct {
 			Code  int    `json:"code"`
@@ -201,13 +228,27 @@ func main() {
 			page -= 1
 		}
 
+		name := context.QueryParam("name")
 		var maps []orm.Params
-		_, err = o.Raw("select category.name,category.id,count(*) "+
-			"from category,product where category.id=product.category_id "+
-			"GROUP BY category.id "+
-			"ORDER BY  COUNT(*) desc limit ? offset ?", size, page*size).Values(&maps)
-		if err != nil {
-			return context.String(http.StatusBadRequest, err.Error())
+		if name == "" {
+			_, err = o.Raw("select  category.parent_id, category.name,category.id,count(*) "+
+				"from category,product where category.id=product.category_id "+
+				"GROUP BY category.id "+
+				"ORDER BY  COUNT(*) desc limit ? offset ?", size, page*size).Values(&maps)
+			if err != nil {
+				return context.String(http.StatusBadRequest, err.Error())
+			}
+		} else {
+			v := "select category.parent_id,category.name,category.id,count(*) from category,product where category.id=product.category_id and " +
+				"category.name like"
+			v += " '%"
+			v += fmt.Sprintf("%s", name)
+			v += "%' GROUP BY category.id ORDER BY  COUNT(*) desc "
+			v += fmt.Sprintf("limit %d offset %d", size, page*size)
+			_, err = o.Raw(v).Values(&maps)
+			if err != nil {
+				return context.String(http.StatusBadRequest, err.Error())
+			}
 		}
 
 		for _, v := range maps {
@@ -216,10 +257,70 @@ func main() {
 				Name:            v["name"].(string),
 				ReviewUserCount: v["count(*)"].(string),
 			}
+			var categoryLink []string
+			categoryLink = append(categoryLink, v["name"].(string))
+			var parentId int64
+			for {
+				if parentId == 0 {
+					if pid, ok := v["parent_id"].(string); ok {
+						if id, err := strconv.Atoi(pid); err == nil {
+							var category models.Category
+							err := o.QueryTable("category").Filter("id", id).One(&category)
+							if err == nil {
+								categoryLink = append(categoryLink, category.Name)
+								if category.Id != 0 && category.ParentId != 0 {
+									parentId = category.ParentId
+								} else {
+									break
+								}
+							} else {
+								break
+							}
+						} else {
+							break
+						}
+
+					} else {
+						break
+					}
+				} else {
+					var category models.Category
+					err := o.QueryTable("category").Filter("id", parentId).One(&category)
+					if err == nil {
+						categoryLink = append(categoryLink, category.Name)
+						if category.Id != 0 && category.ParentId != 0 {
+							parentId = category.ParentId
+						} else {
+							break
+						}
+					} else {
+						break
+					}
+				}
+
+			}
+
+			for i := len(categoryLink) - 1; i >= 0; i-- {
+				if i == 0 {
+					data.CategoryLink += categoryLink[i]
+				} else {
+					data.CategoryLink += fmt.Sprintf("%s->", categoryLink[i])
+				}
+
+			}
+
 			category.Datas = append(category.Datas, data)
 		}
 
-		_, err = o.Raw("select count(distinct category.id) from category,product where category.id=product.category_id").Values(&maps)
+		if name == "" {
+			_, err = o.Raw("select count(distinct category.id) from category,product where category.id=product.category_id").Values(&maps)
+		} else {
+			v := "select count(distinct category.id) from category where category.name like"
+			v += " '%"
+			v += fmt.Sprintf("%s", name)
+			v += "%'"
+			_, err = o.Raw(v).Values(&maps)
+		}
 
 		if err != nil {
 			return context.String(http.StatusBadRequest, err.Error())
