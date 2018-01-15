@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	_ "amazonApi/models"
 	"strconv"
 
 	"amazonApi/models"
