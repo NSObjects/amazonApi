@@ -87,14 +87,14 @@ func main() {
 			userJson.Datas = append(userJson.Datas, data)
 		}
 
-		_, err = o.Raw("select count(distinct user.id) from user,product where user.id=product.user_id ").Values(&maps)
+		_, err = o.Raw("select count(*) from user").Values(&maps)
 
 		if err != nil {
 			return c.String(http.StatusBadRequest, err.Error())
 		}
 		//fmt.Println(maps)
 		if len(maps) > 0 {
-			if s, ok := maps[0]["count(distinct user.id)"].(string); ok {
+			if s, ok := maps[0]["count(*)"].(string); ok {
 				count, err := strconv.Atoi(s)
 				if err == nil {
 					userJson.Total = count
@@ -244,9 +244,18 @@ func main() {
 		id := c.Param("id")
 
 		type Data struct {
-			Id           string `json:"id"`
-			CategoryName string `json:"name"`
-			ReviewCount  string `json:"review_count"`
+			Id         string `json:"id"`
+			Email      string `json:"email"`
+			Facebook   string `json:"facebook"`
+			Twitter    string `json:"twitter"`
+			Instagram  string `json:"instagram"`
+			Pinterest  string `json:"pinterest"`
+			Youtube    string `json:"youtube"`
+			ProfileUrl string `json:"profile_url"`
+			ProfileId  string `json:"profile_id"`
+			Name       string `json:"name"`
+			Country    string `json:"country"`
+			Total      string `json:"review_count"`
 		}
 		var category = struct {
 			Code  int    `json:"code"`
@@ -268,7 +277,7 @@ func main() {
 
 		var maps []orm.Params
 
-		_, err = o.Raw("select user.id,user.name,count(*) "+
+		_, err = o.Raw("select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,count(*) "+
 			"from user,product "+
 			"where user.id = product.user_id and product.`category_id` = ? "+
 			"GROUP BY user.id ORDER BY  COUNT(*) "+
@@ -279,9 +288,17 @@ func main() {
 
 		for _, v := range maps {
 			data := Data{
-				Id:           v["id"].(string),
-				CategoryName: v["name"].(string),
-				ReviewCount:  v["count(*)"].(string),
+				Id:         v["id"].(string),
+				Email:      v["email"].(string),
+				Facebook:   v["facebook"].(string),
+				Twitter:    v["twitter"].(string),
+				Instagram:  v["instagram"].(string),
+				Pinterest:  v["pinterest"].(string),
+				Youtube:    v["youtube"].(string),
+				ProfileUrl: v["profile_url"].(string),
+				Name:       v["name"].(string),
+				Country:    v["country"].(string),
+				Total:      v["count(*)"].(string),
 			}
 			category.Datas = append(category.Datas, data)
 		}
