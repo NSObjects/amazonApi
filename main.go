@@ -87,7 +87,7 @@ func main() {
 			userJson.Datas = append(userJson.Datas, data)
 		}
 
-		_, err = o.Raw("select count(distinct user.id) from user,product where user.id=product.user_id  order by user.id").Values(&maps)
+		_, err = o.Raw("select count(distinct user.id) from user,product where user.id=product.user_id ").Values(&maps)
 
 		if err != nil {
 			return c.String(http.StatusBadRequest, err.Error())
@@ -108,69 +108,6 @@ func main() {
 		userJson.Code = 200
 
 		return c.JSON(http.StatusOK, userJson)
-	})
-
-	e.GET("/category", func(context echo.Context) error {
-		type Data struct {
-			Id              string `json:"id"`
-			Name            string `json:"name"`
-			ReviewUserCount string `json:"review_user_count"`
-		}
-		var category = struct {
-			Code  int    `json:"code"`
-			Total int    `json:"total"`
-			Datas []Data `json:"datas"`
-		}{}
-		o := orm.NewOrm()
-		size, err := strconv.Atoi(context.QueryParam("size"))
-		if err != nil {
-			size = 15
-		}
-		page, err := strconv.Atoi(context.QueryParam("page"))
-		if err != nil {
-			page = 0
-		}
-		if page > 0 {
-			page -= 1
-		}
-
-		var maps []orm.Params
-		_, err = o.Raw("select category.name,category.id,count(*) "+
-			"from category,product where category.id=product.category_id "+
-			"GROUP BY category.id "+
-			"ORDER BY  COUNT(*) desc limit ? offset ?", size, page*size).Values(&maps)
-		if err != nil {
-			return context.String(http.StatusBadRequest, err.Error())
-		}
-
-		for _, v := range maps {
-			data := Data{
-				Id:              v["id"].(string),
-				Name:            v["name"].(string),
-				ReviewUserCount: v["count(*)"].(string),
-			}
-			category.Datas = append(category.Datas, data)
-		}
-
-		_, err = o.Raw("select count(distinct category.id) from category,product where category.id=product.category_id").Values(&maps)
-
-		if err != nil {
-			return context.String(http.StatusBadRequest, err.Error())
-		}
-
-		if len(maps) > 0 {
-			if s, ok := maps[0]["count(distinct category.id)"].(string); ok {
-				count, err := strconv.Atoi(s)
-				if err == nil {
-					category.Total = count
-				} else {
-					fmt.Println(err)
-				}
-			}
-
-		}
-
-		return context.JSON(http.StatusOK, category)
 	})
 
 	e.GET("/user/:id", func(c echo.Context) error {
@@ -239,6 +176,137 @@ func main() {
 
 		return c.JSON(http.StatusOK, category)
 	})
+
+	e.GET("/category", func(context echo.Context) error {
+		type Data struct {
+			Id              string `json:"id"`
+			Name            string `json:"name"`
+			ReviewUserCount string `json:"review_user_count"`
+		}
+		var category = struct {
+			Code  int    `json:"code"`
+			Total int    `json:"total"`
+			Datas []Data `json:"datas"`
+		}{}
+		o := orm.NewOrm()
+		size, err := strconv.Atoi(context.QueryParam("size"))
+		if err != nil {
+			size = 15
+		}
+		page, err := strconv.Atoi(context.QueryParam("page"))
+		if err != nil {
+			page = 0
+		}
+		if page > 0 {
+			page -= 1
+		}
+
+		var maps []orm.Params
+		_, err = o.Raw("select category.name,category.id,count(*) "+
+			"from category,product where category.id=product.category_id "+
+			"GROUP BY category.id "+
+			"ORDER BY  COUNT(*) desc limit ? offset ?", size, page*size).Values(&maps)
+		if err != nil {
+			return context.String(http.StatusBadRequest, err.Error())
+		}
+
+		for _, v := range maps {
+			data := Data{
+				Id:              v["id"].(string),
+				Name:            v["name"].(string),
+				ReviewUserCount: v["count(*)"].(string),
+			}
+			category.Datas = append(category.Datas, data)
+		}
+
+		_, err = o.Raw("select count(distinct category.id) from category,product where category.id=product.category_id").Values(&maps)
+
+		if err != nil {
+			return context.String(http.StatusBadRequest, err.Error())
+		}
+
+		if len(maps) > 0 {
+			if s, ok := maps[0]["count(distinct category.id)"].(string); ok {
+				count, err := strconv.Atoi(s)
+				if err == nil {
+					category.Total = count
+				} else {
+					fmt.Println(err)
+				}
+			}
+
+		}
+
+		return context.JSON(http.StatusOK, category)
+	})
+
+	e.GET("/category/:id", func(c echo.Context) error {
+		id := c.Param("id")
+
+		type Data struct {
+			Id           string `json:"id"`
+			CategoryName string `json:"name"`
+			ReviewCount  string `json:"review_count"`
+		}
+		var category = struct {
+			Code  int    `json:"code"`
+			Total int    `json:"total"`
+			Datas []Data `json:"datas"`
+		}{}
+		o := orm.NewOrm()
+		size, err := strconv.Atoi(c.QueryParam("size"))
+		if err != nil {
+			size = 15
+		}
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			page = 0
+		}
+		if page > 0 {
+			page -= 1
+		}
+
+		var maps []orm.Params
+
+		_, err = o.Raw("select user.id,user.name,count(*) "+
+			"from user,product "+
+			"where user.id = product.user_id and product.`category_id` = ? "+
+			"GROUP BY user.id ORDER BY  COUNT(*) "+
+			"desc limit ? offset ?", id, size, page*size).Values(&maps)
+		if err != nil {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
+
+		for _, v := range maps {
+			data := Data{
+				Id:           v["id"].(string),
+				CategoryName: v["name"].(string),
+				ReviewCount:  v["count(*)"].(string),
+			}
+			category.Datas = append(category.Datas, data)
+		}
+
+		_, err = o.Raw("select count(DISTINCT user.id) from user,product where user.id = product.user_id and product.`category_id` = ? ", id).Values(&maps)
+
+		if err != nil {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
+
+		if len(maps) > 0 {
+			if s, ok := maps[0]["count(DISTINCT user.id)"].(string); ok {
+				count, err := strconv.Atoi(s)
+				if err == nil {
+					category.Total = count
+				} else {
+					fmt.Println(err)
+				}
+			}
+
+		}
+
+		return c.JSON(http.StatusOK, category)
+	})
+
 	e.Logger.Fatal(e.Start(":9527"))
 
 }
