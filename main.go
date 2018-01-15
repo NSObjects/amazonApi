@@ -1,14 +1,11 @@
 package main
 
 import (
-	"net/http"
-
-	"fmt"
-	"time"
-
-	"strconv"
-
 	"amazonApi/models"
+	"fmt"
+	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
