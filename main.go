@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"os"
+	//"os"
 
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -17,8 +17,8 @@ import (
 
 func main() {
 	e := echo.New()
-	orm.Debug = true
-	orm.DebugLog = orm.NewLog(os.Stdout)
+	//orm.Debug = true
+	//orm.DebugLog = orm.NewLog(os.Stdout)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
