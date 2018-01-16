@@ -60,7 +60,7 @@ func main() {
 				fmt.Println(err)
 			}
 		} else {
-			sql := "select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
+			sql := "select DISTINCT user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
 			sql += "'%"
 			sql += name + "%' and user.id = product.user_id "
 			sql += fmt.Sprintf("order by %s", sort)
