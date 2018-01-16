@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"os"
+
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
@@ -15,7 +17,8 @@ import (
 
 func main() {
 	e := echo.New()
-
+	orm.Debug = true
+	orm.DebugLog = orm.NewLog(os.Stdout)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
@@ -23,24 +26,10 @@ func main() {
 
 	e.GET("/user", func(c echo.Context) error {
 
-		type Data struct {
-			Id         string `json:"id"`
-			Email      string `json:"email"`
-			Facebook   string `json:"facebook"`
-			Twitter    string `json:"twitter"`
-			Instagram  string `json:"instagram"`
-			Pinterest  string `json:"pinterest"`
-			Youtube    string `json:"youtube"`
-			ProfileUrl string `json:"profile_url"`
-			ProfileId  string `json:"profile_id"`
-			Name       string `json:"name"`
-			Country    string `json:"country"`
-			Total      string `json:"review_count"`
-		}
 		var userJson = struct {
-			Code  int    `json:"code"`
-			Total int    `json:"total"`
-			Datas []Data `json:"datas"`
+			Code  int           `json:"code"`
+			Total int64         `json:"total"`
+			Datas []models.User `json:"datas"`
 		}{}
 
 		o := orm.NewOrm()
@@ -56,77 +45,34 @@ func main() {
 		if page > 0 {
 			page -= 1
 		}
+		sort := c.QueryParam("sort")
+		if sort == "" {
+			sort = "helpful_votes"
+		}
+
+		sort = "-" + sort
 
 		name := c.QueryParam("name")
-		var maps []orm.Params
+		var users []models.User
 		if name == "" {
-
-			_, err = o.Raw("select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,count(*) "+
-				"from user,product "+
-				"where user.id = product.user_id "+
-				"Group by user.id "+
-				"order by count(*) "+
-				"Desc limit ? offset ?", size, page*size).Values(&maps)
+			_, err = o.QueryTable("user").OrderBy(sort).Limit(size, page*size).All(&users)
 			if err != nil {
-				return c.String(http.StatusBadRequest, err.Error())
+				fmt.Println(err)
 			}
 		} else {
-
-			v := "select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,count(*) " +
-				"from user,product where user.id = product.user_id and user.name like"
-			v += " '%"
-			v += fmt.Sprintf("%s", name)
-			v += "%' Group by user.id order by count(*) Desc "
-			v += fmt.Sprintf("limit %d offset %d", size, page*size)
-			_, err = o.Raw(v).Values(&maps)
+			sql := "select user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
+			sql += "'%"
+			sql += name + "%' and user.id = product.user_id "
+			sql += fmt.Sprintf("order by %s", sort)
+			fmt.Println(sql)
+			_, err := o.Raw(sql).QueryRows(&users)
 			if err != nil {
-				return c.String(http.StatusBadRequest, err.Error())
+				fmt.Println(err)
 			}
 		}
 
-		for _, v := range maps {
-			data := Data{
-				Id:         v["id"].(string),
-				Email:      v["email"].(string),
-				Facebook:   v["facebook"].(string),
-				Twitter:    v["twitter"].(string),
-				Instagram:  v["instagram"].(string),
-				Pinterest:  v["pinterest"].(string),
-				Youtube:    v["youtube"].(string),
-				ProfileUrl: v["profile_url"].(string),
-				Name:       v["name"].(string),
-				Country:    v["country"].(string),
-				Total:      v["count(*)"].(string),
-			}
-			userJson.Datas = append(userJson.Datas, data)
-		}
-
-		if name == "" {
-			_, err = o.Raw("select count(*) from user").Values(&maps)
-		} else {
-			v := "select count(*) from user where user.name like"
-			v += " '%"
-			v += fmt.Sprintf("%s", name)
-			v += "%'"
-			_, err = o.Raw(v).Values(&maps)
-		}
-
-		if err != nil {
-			return c.String(http.StatusBadRequest, err.Error())
-		}
-
-		if len(maps) > 0 {
-			if s, ok := maps[0]["count(*)"].(string); ok {
-				count, err := strconv.Atoi(s)
-				if err == nil {
-					userJson.Total = count
-				} else {
-					fmt.Println(err)
-				}
-			}
-
-		}
-
+		userJson.Total, _ = o.QueryTable("user").Count()
+		userJson.Datas = users
 		userJson.Code = 200
 
 		return c.JSON(http.StatusOK, userJson)
@@ -432,7 +378,7 @@ func init() {
 		fmt.Println(err)
 	}
 	time.Local = local
-	err = orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/amazon?parseTime=true&loc=Asia%2FShanghai", 30, 30)
+	err = orm.RegisterDataBase("default", "mysql", "root:123456@tcp(127.0.0.1:3306)/amazon?parseTime=true&loc=Asia%2FShanghai", 30, 30)
 	if err != nil {
 		fmt.Println(err)
 	}
