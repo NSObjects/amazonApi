@@ -59,8 +59,9 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
+			userJson.Total, _ = o.QueryTable("user").Count()
 		} else {
-			sql := "select DISTINCT user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
+			sql := "select DISTINCT user.profile_url,user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
 			sql += "'%"
 			sql += name + "%' and user.id = product.user_id "
 			sql += fmt.Sprintf("order by %s", sort)
@@ -69,9 +70,9 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
+			userJson.Total = int64(len(users))
 		}
 
-		userJson.Total, _ = o.QueryTable("user").Count()
 		userJson.Datas = users
 		userJson.Code = 200
 
