@@ -4,6 +4,7 @@ import (
 	"amazonApi/models"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -17,8 +18,8 @@ import (
 
 func main() {
 	e := echo.New()
-	//orm.Debug = true
-	//orm.DebugLog = orm.NewLog(os.Stdout)
+	orm.Debug = true
+	orm.DebugLog = orm.NewLog(os.Stdout)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},

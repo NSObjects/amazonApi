@@ -17,13 +17,13 @@
       <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
-              <caret line="69" column="68" lean-forward="false" selection-start-line="69" selection-start-column="68" selection-end-line="69" selection-end-column="68" />
+            <state relative-caret-position="123">
+              <caret line="56" column="0" lean-forward="true" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
               <folding>
-                <element signature="e#14#227#0" expanded="true" />
-                <element signature="e#3782#7410#0" expanded="false" />
-                <element signature="e#5529#6459#0" expanded="false" />
-                <element signature="e#7464#9817#0" expanded="false" />
+                <element signature="e#14#233#0" expanded="true" />
+                <element signature="e#3785#7413#0" expanded="false" />
+                <element signature="e#5532#6462#0" expanded="false" />
+                <element signature="e#7467#9820#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -346,10 +346,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#14#227#0" expanded="true" />
-            <element signature="e#3782#7410#0" expanded="false" />
-            <element signature="e#5529#6459#0" expanded="false" />
-            <element signature="e#7464#9817#0" expanded="false" />
+            <element signature="e#14#233#0" expanded="true" />
+            <element signature="e#3785#7413#0" expanded="false" />
+            <element signature="e#5532#6462#0" expanded="false" />
+            <element signature="e#7467#9820#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -431,10 +431,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#14#227#0" expanded="true" />
-            <element signature="e#3782#7410#0" expanded="false" />
-            <element signature="e#5529#6459#0" expanded="false" />
-            <element signature="e#7464#9817#0" expanded="false" />
+            <element signature="e#14#233#0" expanded="true" />
+            <element signature="e#3785#7413#0" expanded="false" />
+            <element signature="e#5532#6462#0" expanded="false" />
+            <element signature="e#7467#9820#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -514,10 +514,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#14#227#0" expanded="true" />
-            <element signature="e#3782#7410#0" expanded="false" />
-            <element signature="e#5529#6459#0" expanded="false" />
-            <element signature="e#7464#9817#0" expanded="false" />
+            <element signature="e#14#233#0" expanded="true" />
+            <element signature="e#3785#7413#0" expanded="false" />
+            <element signature="e#5532#6462#0" expanded="false" />
+            <element signature="e#7467#9820#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -567,10 +567,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#14#227#0" expanded="true" />
-            <element signature="e#3782#7410#0" expanded="false" />
-            <element signature="e#5529#6459#0" expanded="false" />
-            <element signature="e#7464#9817#0" expanded="false" />
+            <element signature="e#14#233#0" expanded="true" />
+            <element signature="e#3785#7413#0" expanded="false" />
+            <element signature="e#5532#6462#0" expanded="false" />
+            <element signature="e#7467#9820#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -703,13 +703,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="398">
-          <caret line="69" column="68" lean-forward="false" selection-start-line="69" selection-start-column="68" selection-end-line="69" selection-end-column="68" />
+        <state relative-caret-position="123">
+          <caret line="56" column="0" lean-forward="true" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
           <folding>
-            <element signature="e#14#227#0" expanded="true" />
-            <element signature="e#3782#7410#0" expanded="false" />
-            <element signature="e#5529#6459#0" expanded="false" />
-            <element signature="e#7464#9817#0" expanded="false" />
+            <element signature="e#14#233#0" expanded="true" />
+            <element signature="e#3785#7413#0" expanded="false" />
+            <element signature="e#5532#6462#0" expanded="false" />
+            <element signature="e#7467#9820#0" expanded="false" />
           </folding>
         </state>
       </provider>
