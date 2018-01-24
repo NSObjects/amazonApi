@@ -67,7 +67,7 @@ func main() {
 			sql += "'%"
 			sql += name + "%' and user.id = product.user_id "
 			if country != "" {
-				sql += fmt.Sprintf(" and user.country = %s", country)
+				sql += fmt.Sprintf(" and user.country = %s ", country)
 			}
 			sql += fmt.Sprintf("order by %s", sort)
 			fmt.Println(sql)
