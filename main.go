@@ -52,6 +52,8 @@ func main() {
 
 		sort = "-" + sort
 
+		country := c.QueryParam("country")
+
 		name := c.QueryParam("name")
 		var users []models.User
 		if name == "" {
@@ -64,6 +66,9 @@ func main() {
 			sql := "select DISTINCT user.profile_url,user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
 			sql += "'%"
 			sql += name + "%' and user.id = product.user_id "
+			if country != "" {
+				sql += fmt.Sprintf(" and user.country = %s", country)
+			}
 			sql += fmt.Sprintf("order by %s", sort)
 			fmt.Println(sql)
 			_, err := o.Raw(sql).QueryRows(&users)
