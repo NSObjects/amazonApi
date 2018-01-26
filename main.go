@@ -83,7 +83,7 @@ func main() {
 			//	fmt.Println(err)name__icontains
 			//}
 
-			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).Limit(size, page*size).RelatedSel().All(&users)
+			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).OrderBy(sort).Limit(size, page*size).RelatedSel().All(&users)
 			if err != nil {
 				fmt.Println(err)
 			}
