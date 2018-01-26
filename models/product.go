@@ -9,8 +9,9 @@ type Product struct {
 	CategoryId  int64    `json:"category_id"`
 	Categorys   []string `orm:"-" json:"categorys"`
 	Name        string   `json:"name"`
-	UserId      int64    `json:"user_id"`
-	ReviewUrl   string   `json:"review_url"`
+
+	ReviewUrl string `json:"review_url"`
+	User      *User  `orm:"rel(fk)"`
 }
 
 func init() {
