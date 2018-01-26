@@ -13,9 +13,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/spf13/viper"
 )
 
 func main() {
+
 	e := echo.New()
 	//orm.Debug = true
 	//orm.DebugLog = orm.NewLog(os.Stdout)
@@ -373,18 +375,74 @@ func main() {
 		return c.JSON(http.StatusOK, category)
 	})
 
+	e.GET("/product", func(context echo.Context) error {
+		userId := context.QueryParam("user_id")
+
+		if userId == "" {
+			return context.JSON(http.StatusOK, "user id is nil")
+		}
+
+		name := context.QueryParam("name")
+		size, err := strconv.Atoi(context.QueryParam("size"))
+		if err != nil {
+			size = 15
+		}
+
+		page, err := strconv.Atoi(context.QueryParam("page"))
+		if err != nil {
+			page = 0
+		}
+
+		var products []models.Product
+
+		o := orm.NewOrm()
+
+		_, err = o.QueryTable("product").
+			Filter("user_id", userId).
+			Filter("name__icontains", name).
+			Limit(size, page*size).
+			All(&products)
+		if err != nil {
+			return context.JSON(http.StatusOK, err)
+		}
+		count, err := o.QueryTable("product").
+			Filter("user_id", userId).
+			Filter("name__icontains", name).Count()
+		var j struct {
+			Data  []models.Product `json:"data"`
+			Total int64            `json:"total"`
+		}
+		j.Total = count
+		j.Data = products
+		return context.JSON(http.StatusOK, &j)
+	})
+
 	e.Logger.Fatal(e.Start(":9527"))
 
 }
 
 func init() {
+
+	viper.SetConfigType("yaml")
+	viper.SetConfigFile("./config/app.yaml")
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+
 	local, err := time.LoadLocation("Asia/Shanghai")
 
 	if err != nil {
 		fmt.Println(err)
 	}
 	time.Local = local
-	err = orm.RegisterDataBase("default", "mysql", "root:123456@tcp(127.0.0.1:3306)/amazon?parseTime=true&loc=Asia%2FShanghai", 30, 30)
+
+	if viper.Get("runmodel") == "dev" {
+		err = orm.RegisterDataBase("default", "mysql", "root:123456@tcp(192.168.12.137:3306)/amazon?parseTime=true&loc=Asia%2FShanghai")
+	} else {
+		err = orm.RegisterDataBase("default", "mysql", "root:123456@tcp(127.0.0.1.137:3306)/amazon?parseTime=true&loc=Asia%2FShanghai")
+	}
+
 	if err != nil {
 		fmt.Println(err)
 	}
