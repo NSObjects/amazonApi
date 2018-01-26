@@ -83,12 +83,12 @@ func main() {
 			//	fmt.Println(err)name__icontains
 			//}
 
-			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).RelatedSel().All(&users)
+			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).Limit(size, page*size).RelatedSel().All(&users)
 			if err != nil {
 				fmt.Println(err)
 			}
-
-			userJson.Total = int64(len(users))
+			count, _ := o.QueryTable("user").Filter("Products__name__icontains", name).RelatedSel().Count()
+			userJson.Total = count
 		}
 
 		userJson.Datas = users
