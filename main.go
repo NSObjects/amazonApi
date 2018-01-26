@@ -376,7 +376,7 @@ func main() {
 	})
 
 	e.GET("/product", func(context echo.Context) error {
-		userId := context.QueryParam("user_id")
+		userId := context.QueryParam("userId")
 
 		if userId == "" {
 			return context.JSON(http.StatusOK, "user id is nil")
