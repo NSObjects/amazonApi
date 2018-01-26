@@ -76,7 +76,7 @@ func main() {
 				sql += fmt.Sprintf(" and user.country = %s ", country)
 			}
 			sql += fmt.Sprintf("order by %s", sort)
-			sql += fmt.Sprintf(" limit ? offset ?", size, page*size)
+			sql += fmt.Sprintf(" limit %d offset %d", size, page*size)
 			_, err := o.Raw(sql).QueryRows(&users)
 			if err != nil {
 				fmt.Println(err)
