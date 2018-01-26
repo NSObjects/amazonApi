@@ -59,7 +59,11 @@ func main() {
 		name := c.QueryParam("name")
 		var users []models.User
 		if name == "" {
-			_, err = o.QueryTable("user").OrderBy(sort).Limit(size, page*size).All(&users)
+			qs := o.QueryTable("user")
+			if country != "" {
+				qs = qs.Filter("country", country)
+			}
+			_, err = qs.OrderBy(sort).Limit(size, page*size).All(&users)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -72,7 +76,7 @@ func main() {
 				sql += fmt.Sprintf(" and user.country = %s ", country)
 			}
 			sql += fmt.Sprintf("order by %s", sort)
-			fmt.Println(sql)
+
 			_, err := o.Raw(sql).QueryRows(&users)
 			if err != nil {
 				fmt.Println(err)
