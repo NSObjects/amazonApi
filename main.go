@@ -69,20 +69,6 @@ func main() {
 			}
 			userJson.Total, _ = o.QueryTable("user").Count()
 		} else {
-			//sql := "select DISTINCT user.profile_url,user.id,user.email,user.facebook,user.twitter,user.instagram,user.profile_url,user.pinterest,user.youtube,user.country,user.name,user.helpful_votes, user.reviews from user,product where product.name like "
-			//sql += "'%"
-			//sql += name + "%' and user.id = product.user_id "
-			//if country != "" {
-			//	sql += fmt.Sprintf(" and user.country = %s ", country)
-			//}
-			//
-			//sql += fmt.Sprintf("order by %s", sort)
-			//sql += fmt.Sprintf(" limit %d offset %d", size, page*size)
-			//_, err := o.Raw(sql).QueryRows(&users)
-			//if err != nil {
-			//	fmt.Println(err)name__icontains
-			//}
-
 			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).OrderBy(sort).Limit(size, page*size).RelatedSel().All(&users)
 			if err != nil {
 				fmt.Println(err)
