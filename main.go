@@ -393,6 +393,9 @@ func main() {
 			page = 0
 		}
 
+		if page > 0 {
+			page -= 0
+		}
 		var products []models.Product
 
 		o := orm.NewOrm()
