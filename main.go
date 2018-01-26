@@ -69,11 +69,11 @@ func main() {
 			}
 			userJson.Total, _ = o.QueryTable("user").Count()
 		} else {
-			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).OrderBy(sort).Limit(size, page*size).RelatedSel().All(&users)
+			_, err := o.QueryTable("user").Filter("Products__name__icontains", name).OrderBy(sort).Limit(size, page*size).RelatedSel().Distinct().All(&users)
 			if err != nil {
 				fmt.Println(err)
 			}
-			count, _ := o.QueryTable("user").Filter("Products__name__icontains", name).RelatedSel().Count()
+			count, _ := o.QueryTable("user").Filter("Products__name__icontains", name).RelatedSel().Distinct().Count()
 			userJson.Total = count
 		}
 
