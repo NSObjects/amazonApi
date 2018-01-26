@@ -398,7 +398,7 @@ func main() {
 		}
 
 		if page > 0 {
-			page -= 0
+			page -= 1
 		}
 		var products []models.Product
 
@@ -415,6 +415,7 @@ func main() {
 		count, err := o.QueryTable("product").
 			Filter("user_id", userId).
 			Filter("name__icontains", name).Count()
+
 		var j struct {
 			Data  []models.Product `json:"data"`
 			Total int64            `json:"total"`
